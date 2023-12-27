@@ -10,7 +10,8 @@ In order to obtein the research's results it is necessary to open and run the di
 1- CCDC's base
 2- CCDC Raster Conditioning
 3- Raster to CSV
-4- Classification and export
+4- Obtein the threshold
+5- Classification and export
 
 
 
@@ -23,4 +24,5 @@ Para obtener los resultados de la investigación es necesario abrir y ejecutar l
 1- CCDC's base
 2- CCDC Raster Conditioning
 3- Raster to CSV
-4- Classification and export
+4- Obtein the threshold
+5- Classification and export
