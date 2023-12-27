@@ -1,0 +1,187 @@
+/*
+This code is the next step in order to obtein for each level of change one raster
+*/
+
+//////////////////////////////////
+// First part: upload the raster obteined in CCDD_Base
+//////////////////////////////////
+
+var image=CCDC_Base;
+
+//We can see it 
+
+Map.addLayer(image);
+
+//////////////////////////////////
+// Second part: Raster Conditioning
+//////////////////////////////////
+
+// Select the variable you want to extract... in this case 'tBreak' which is the date of the change.
+
+var tiempo= image.select('tBreak').toArray().toArray();
+var image_array=tiempo.arrayProject([0]);
+
+// Because the output raster is nested in 6 levels, it is necessary to extract each of these into a different variable.
+
+// 1st one
+
+var uno = image_array.arraySlice(0,0,1).rename('t1');
+var uno=uno.arrayProject([0]);
+var uno=uno.arrayFlatten([['t1']]);
+
+// 2nd one
+var dos = image_array.arraySlice(0,1,2).rename('t2');
+var dos=dos.arrayProject([0]);
+var dos=dos.arrayFlatten([['t2']]);
+
+// 3rd one
+var tres = image_array.arraySlice(0,2,3).rename('t3');
+var tres=tres.arrayProject([0]);
+var tres=tres.arrayFlatten([['t3']]);
+
+// 4th
+var cuatro = image_array.arraySlice(0,3,4).rename('t4');
+var cuatro=cuatro.arrayProject([0]);
+var cuatro=cuatro.arrayFlatten([['t4']]);
+
+// 5th
+var cinco = image_array.arraySlice(0,4,5).rename('t5');
+var cinco=cinco.arrayProject([0]);
+var cinco=cinco.arrayFlatten([['t5']]);
+
+// 6th
+
+var seis = image_array.arraySlice(0,5,6).rename('t6');
+var seis=seis.arrayProject([0]);
+var seis=seis.arrayFlatten([['t6']]);
+
+// If we want to extract another information such a probability of change the procesure it will be the same
+
+// Select the variable... in this case 'changeProb'
+
+var var_2= image.select('changeProb').toArray().toArray();
+var img_v2=var_2.arrayProject([0]);
+
+// Create one new variable for each level
+var one_prob_v2 = img_v2.arraySlice(0,0,1).rename('Prob_1');
+var one_prob_v2=one_prob_v2.arrayProject([0]);
+var one_prob_v2=one_prob_v2.arrayFlatten([['Prob_1']]);
+
+var two_prob_v2 = img_v2.arraySlice(0,1,2).rename('Prob_2');
+var two_prob_v2=two_prob_v2.arrayProject([0]);
+var two_prob_v2=two_prob_v2.arrayFlatten([['Prob_2']]);
+
+var three_prob_v2 = img_v2.arraySlice(0,2,3).rename('Prob_3');
+var three_prob_v2=three_prob_v2.arrayProject([0]);
+var three_prob_v2=three_prob_v2.arrayFlatten([['Prob_3']]);
+
+var four_prob_v2 = img_v2.arraySlice(0,3,4).rename('Prob_4');
+var four_prob_v2=four_prob_v2.arrayProject([0]);
+var four_prob_v2=four_prob_v2.arrayFlatten([['Prob_4']]);
+
+var five_prob_v2 = img_v2.arraySlice(0,4,5).rename('Prob_5');
+var five_prob_v2=five_prob_v2.arrayProject([0]);
+var five_prob_v2=five_prob_v2.arrayFlatten([['Prob_5']]);
+
+var six_prob_v2 = img_v2.arraySlice(0,5,6).rename('Prob_6');
+var six_prob_v2=six_prob_v2.arrayProject([0]);
+var six_prob_v2=six_prob_v2.arrayFlatten([['Prob_6']]);
+
+
+//////////////////////////////////
+// Third part: Join
+//////////////////////////////////
+
+//Combine the two variables into one 
+
+var union_1= uno.addBands([one_prob_v2);
+
+var union_2= dos.addBands([two_prob_v2]);
+
+var union_3= tres.addBands([three_prob_v2]);
+
+var union_4= cuatro.addBands([four_prob_v2);
+
+var union_5= cinco.addBands([five_prob_v2]);
+
+var union_6= seis.addBands([six_prob_v2]);
+
+
+// This could be see with the follow code
+
+Map.addLayer(union_1,{min:2015,max:2022},'t1');
+Map.addLayer(union_2,{min:2015,max:2022},'t2');
+Map.addLayer(union_3,{min:2015,max:2022},'t3');
+Map.addLayer(union_4,{min:2015,max:2022},'t4');
+Map.addLayer(union_5,{min:2015,max:2022},'t5');
+Map.addLayer(union_6,{min:2015,max:2022},'t6');
+
+
+//////////////////////////////////
+// Fourth part: Export each level as a raster
+//////////////////////////////////
+
+// The archive will be saved into you drive
+
+Export.image.toDrive({
+  image: union_1,
+  crs: 'EPSG:4326',
+  description:'CCDC_t1',
+  scale:30,
+  folder:'gee/raster',
+  maxPixels: 1e10
+});
+
+
+
+Export.image.toDrive({
+  image: union_2,
+  crs: 'EPSG:4326',
+  description:'CCDC_t2',
+  scale:30,
+  folder:'gee/raster',
+  maxPixels: 1e10
+});
+
+
+Export.image.toDrive({
+  image: union_3,
+  crs: 'EPSG:4326',
+  description:'CCDC_t3',
+  scale:30,
+  folder:'gee/raster',
+  maxPixels: 1e10
+});
+
+
+
+Export.image.toDrive({
+  image: union_4,
+  crs: 'EPSG:4326',
+  description:'CCDC_t4',
+  scale:30,
+  folder:'gee/raster',
+  maxPixels: 1e10
+});
+
+
+Export.image.toDrive({
+  image: union_5,
+  crs: 'EPSG:4326',
+  description:'CCDC_t5',
+  scale:30,
+  folder:'gee/raster',
+  maxPixels: 1e10
+});
+
+
+Export.image.toDrive({
+  image: union_6,
+  crs: 'EPSG:4326',
+  description:'CCDC_t6',
+  scale:30,
+  folder:'gee/raster',
+  maxPixels: 1e10
+});
+
+
