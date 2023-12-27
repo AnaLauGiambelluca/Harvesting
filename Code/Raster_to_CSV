@@ -1,0 +1,421 @@
+'''
+In this code it will be possible to calculate for each plot how many pixels had changes in each year.
+It also takes into account the probability that there has been a change, which must be equal to 1 for it to be considered valid.
+
+It was created in notebook of jupyter with Python code
+'''
+
+###################################################################
+##  First part: import libraries
+###################################################################
+
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline  
+import os
+import rasterio
+import rasterio.features
+import rasterio.warp
+from osgeo import gdal
+from matplotlib import pyplot
+from rasterio.plot import show 
+import geopandas as gpd
+from osgeo import ogr, osr
+import math
+
+###################################################################
+## Second part: upload SHP and resters of CCDC_Raster_Conditioning
+###################################################################
+
+directory=input('Where are shp layers?: ')
+os.chdir(directory)
+
+SHP_T=gpd.read_file('Thinning_plot.shp')
+SHP_C=gpd.read_file('Control_plot.shp')
+SHP_CC=gpd.read_file('Clear_cutting_plot.shp')
+
+directory_raster=input('Where are raster layers?: ')
+os.chdir(directory_raster)
+B_t1=gdal.Open('CCDC_t1.tif')
+B_t2=gdal.Open('CCDC_t2.tif')
+B_t3=gdal.Open('CCDC_t3.tif')
+B_t4=gdal.Open('CCDC_t4.tif')
+B_t5=gdal.Open('CCDC_t5.tif')
+B_t6=gdal.Open('CCDC_t6.tif')
+
+// Extract the first band... in this case tBreak with the date of change
+
+B1_t1=B_t1.GetRasterBand(1).ReadAsArray().astype(np.float32)
+B1_t2=B_t2.GetRasterBand(1).ReadAsArray().astype(np.float32)
+B1_t3=B_t3.GetRasterBand(1).ReadAsArray().astype(np.float32)
+B1_t4=B_t4.GetRasterBand(1).ReadAsArray().astype(np.float32)
+B1_t5=B_t5.GetRasterBand(1).ReadAsArray().astype(np.float32)
+B1_t6=B_t6.GetRasterBand(1).ReadAsArray().astype(np.float32)
+
+// Extract the second band... in this case changeProb with the probability of change
+B4_t1=B_t1.GetRasterBand(2).ReadAsArray().astype(np.float32)
+B4_t2=B_t2.GetRasterBand(2).ReadAsArray().astype(np.float32)
+B4_t3=B_t3.GetRasterBand(2).ReadAsArray().astype(np.float32)
+B4_t4=B_t4.GetRasterBand(2).ReadAsArray().astype(np.float32)
+B4_t5=B_t5.GetRasterBand(2).ReadAsArray().astype(np.float32)
+B4_t6=B_t6.GetRasterBand(2).ReadAsArray().astype(np.float32)
+
+
+###################################################################
+## Third part: get change for each year by filtering
+###################################################################
+
+# Get change occured in 2015
+
+capa_1 = np.where((B1_t1 < 2016) & (B1_t1 >=2015) , B1_t1, 0)
+capa_2 = np.where((B1_t2 < 2016) & (B1_t2 >=2015) , B1_t2, 0)
+capa_3 = np.where((B1_t3 < 2016) & (B1_t3 >=2015) , B1_t3, 0)
+capa_4 = np.where((B1_t4 < 2016) & (B1_t4 >=2015) , B1_t4, 0)
+capa_5 = np.where((B1_t5 < 2016) & (B1_t5 >=2015) , B1_t5, 0)
+capa_6 = np.where((B1_t6 < 2016) & (B1_t6 >=2015) , B1_t6, 0)
+
+t_2015=capa_1+capa_2+capa_3+capa_4+capa_5+capa_6
+
+# Obtain the probability of change for events that occurred in 2015
+
+Prob1 = np.where((capa_1 !=0) , B4_t1, 0)
+Prob2 = np.where((capa_2 !=0) , B4_t2, 0)
+Prob3 = np.where((capa_3 !=0) , B4_t3, 0)
+Prob4 = np.where((capa_4 !=0) , B4_t4, 0)
+Prob5 = np.where((capa_5 !=0) , B4_t5, 0)
+Prob6 = np.where((capa_6 !=0) , B4_t6, 0)
+
+Prob_2015=Prob1+Prob2+Prob3+Prob4+Prob5+Prob6
+
+del capa_1,capa_2,capa_3,capa_4,capa_5,capa_6
+del Prob1,Prob2,Prob3,Prob4,Prob5,Prob6
+
+# Get change occured in 2016
+
+t_1 = np.where((B1_t1 < 2017) & (B1_t1 >=2016) , B1_t1, 0)
+t_2 = np.where((B1_t2 < 2017) & (B1_t2 >=2016) , B1_t2, 0)
+t_3 = np.where((B1_t3 < 2017) & (B1_t3 >=2016) , B1_t3, 0)
+t_4 = np.where((B1_t4 < 2017) & (B1_t4 >=2016) , B1_t4, 0)
+t_5 = np.where((B1_t5 < 2017) & (B1_t5 >=2016) , B1_t5, 0)
+t_6 = np.where((B1_t6 < 2017) & (B1_t6 >=2016) , B1_t6, 0)
+t_2016=t_1+t_2+t_3+t_4+t_5+t_6
+
+Prob_1_2016 = np.where((t_1 !=0) , B4_t1, 0)
+Prob_2_2016 = np.where((t_2 !=0) , B4_t2, 0)
+Prob_3_2016 = np.where((t_3 !=0) , B4_t3, 0)
+Prob_4_2016 = np.where((t_4 !=0) , B4_t4, 0)
+Prob_5_2016 = np.where((t_5 !=0) , B4_t5, 0)
+Prob_6_2016 = np.where((t_6 !=0) , B4_t6, 0)
+
+Prob_2016=Prob_1_2016+Prob_2_2016+Prob_3_2016+Prob_4_2016+Prob_5_2016+Prob_6_2016
+del t_1,t_2,t_3,t_4,t_5,t_6
+del Prob_1_2016,Prob_2_2016,Prob_3_2016,Prob_4_2016,Prob_5_2016,Prob_6_2016
+
+#2017
+t_1 = np.where((B1_t1 < 2018) & (B1_t1 >=2017) , B1_t1, 0)
+t_2= np.where((B1_t2 < 2018) & (B1_t2 >=2017) , B1_t2,0)
+t_3 = np.where((B1_t3 < 2018) & (B1_t3 >=2017) , B1_t3, 0)
+t_4 = np.where((B1_t4 < 2018) & (B1_t4 >=2017) , B1_t4, 0)
+t_5 = np.where((B1_t5 < 2018) & (B1_t5 >=2017) , B1_t5,0)
+t_6= np.where((B1_t6 < 2018) & (B1_t6 >=2017) , B1_t6, 0)
+
+t_2017=t_1+t_2+t_3+t_4+t_5+t_6
+
+#Para 2017 3
+Prob_1_2017 = np.where((t_1 !=0) , B4_t1, 0)
+Prob_2_2017 = np.where((t_2 !=0) , B4_t2, 0)
+Prob_3_2017 = np.where((t_3 !=0) , B4_t3, 0)
+Prob_4_2017 = np.where((t_4 !=0) , B4_t4, 0)
+Prob_5_2017 = np.where((t_5 !=0) , B4_t5, 0)
+Prob_6_2017 = np.where((t_6 !=0) , B4_t6, 0)
+
+Prob_2017=Prob_1_2017+Prob_2_2017+Prob_3_2017+Prob_4_2017+Prob_5_2017+Prob_6_2017
+
+del  t_1,t_2,t_3,t_4,t_5,t_6
+del Prob_1_2017,Prob_2_2017,Prob_3_2017,Prob_4_2017,Prob_5_2017,Prob_6_2017
+
+#2018
+t_1= np.where((B1_t1 < 2019) & (B1_t1 >=2018) , B1_t1, 0)
+t_2 = np.where((B1_t2 < 2019) & (B1_t2 >=2018) , B1_t2, 0)
+t_3 = np.where((B1_t3 < 2019) & (B1_t3 >=2018) , B1_t3, 0)
+t_4 = np.where((B1_t4 < 2019) & (B1_t4 >=2018) , B1_t4, 0)
+t_5 = np.where((B1_t5 < 2019) & (B1_t5 >=2018) , B1_t5, 0)
+t_6= np.where((B1_t6 < 2019) & (B1_t6 >=2018) , B1_t6, 0)
+
+t_2018=t_1+t_2+t_3+t_4+t_5+t_6
+
+#Para 2018 3
+Prob_1_2018 = np.where((t_1 !=0) , B4_t1, 0)
+Prob_2_2018 = np.where((t_2 !=0) , B4_t2, 0)
+Prob_3_2018 = np.where((t_3 !=0) , B4_t3, 0)
+Prob_4_2018 = np.where((t_4 !=0) , B4_t4, 0)
+Prob_5_2018 = np.where((t_5 !=0) , B4_t5, 0)
+Prob_6_2018 = np.where((t_6 !=0) , B4_t6, 0)
+
+Prob_2018=Prob_1_2018+Prob_2_2018+Prob_3_2018+Prob_4_2018+Prob_5_2018+Prob_6_2018
+
+del  t_1,t_2,t_3,t_4,t_5,t_6
+del Prob_1_2018,Prob_2_2018,Prob_3_2018,Prob_4_2018,Prob_5_2018,Prob_6_2018
+
+#2019
+
+t_1 = np.where((B1_t1 < 2020) & (B1_t1 >=2019) , B1_t1, 0)
+t_2 = np.where((B1_t2 < 2020) & (B1_t2 >=2019) , B1_t2, 0)
+t_3 = np.where((B1_t3 < 2020) & (B1_t3 >=2019) , B1_t3, 0)
+t_4 = np.where((B1_t4 < 2020) & (B1_t4 >=2019) , B1_t4, 0)
+t_5 = np.where((B1_t5 < 2020) & (B1_t5 >=2019) , B1_t5, 0)
+t_6 = np.where((B1_t6 < 2020) & (B1_t6 >=2019) , B1_t6, 0)
+
+t_2019=t_1+t_2+t_3+t_4+t_5+t_6
+
+Prob_1_2019 = np.where((t_1 !=0) , B4_t1, 0)
+Prob_2_2019 = np.where((t_2 !=0) , B4_t2, 0)
+Prob_3_2019 = np.where((t_3 !=0) , B4_t3, 0)
+Prob_4_2019 = np.where((t_4 !=0) , B4_t4, 0)
+Prob_5_2019 = np.where((t_5 !=0) , B4_t5, 0)
+Prob_6_2019 = np.where((t_6 !=0) , B4_t6, 0)
+
+Prob_2019=Prob_1_2019+Prob_2_2019+Prob_3_2019+Prob_4_2019+Prob_5_2019+Prob_6_2019
+
+del  t_1,t_2,t_3,t_4,t_5,t_6
+del Prob_1_2019,Prob_2_2019,Prob_3_2019,Prob_4_2019,Prob_5_2019,Prob_6_2019
+
+#2020
+
+t_1 = np.where((B1_t1 < 2021) & (B1_t1 >=2020) , B1_t1, 0)
+t_2 = np.where((B1_t2 < 2021) & (B1_t2 >=2020) , B1_t2, 0)
+t_3 = np.where((B1_t3 < 2021) & (B1_t3 >=2020) , B1_t3, 0)
+t_4 = np.where((B1_t4 < 2021) & (B1_t4 >=2020) , B1_t4, 0)
+t_5 = np.where((B1_t5 < 2021) & (B1_t5 >=2020) , B1_t5, 0)
+t_6= np.where((B1_t6 < 2021) & (B1_t6 >=2020) , B1_t6, 0)
+
+t_2020=t_1+t_2+t_3+t_4+t_5+t_6
+
+Prob_1_2020 = np.where((t_1 !=0) , B4_t1, 0)
+Prob_2_2020 = np.where((t_2 !=0) , B4_t2, 0)
+Prob_3_2020 = np.where((t_3 !=0) , B4_t3, 0)
+Prob_4_2020 = np.where((t_4 !=0) , B4_t4, 0)
+Prob_5_2020 = np.where((t_5 !=0) , B4_t5, 0)
+Prob_6_2020 = np.where((t_6 !=0) , B4_t6, 0)
+
+Prob_2020=Prob_1_2020+Prob_2_2020+Prob_3_2020+Prob_4_2020+Prob_5_2020+Prob_6_2020
+
+del  t_1,t_2,t_3,t_4,t_5,t_6
+del Prob_1_2020,Prob_2_2020,Prob_3_2020,Prob_4_2020,Prob_5_2020,Prob_6_2020
+
+#2021
+
+t_1 = np.where((B1_t1 < 2022) & (B1_t1 >=2021) , B1_t1, 0)
+t_2 = np.where((B1_t2 < 2022) & (B1_t2 >=2021) , B1_t2, 0)
+t_3 = np.where((B1_t3 < 2022) & (B1_t3 >=2021) , B1_t3, 0)
+t_4 = np.where((B1_t4 < 2022) & (B1_t4 >=2021) , B1_t4, 0)
+t_5 = np.where((B1_t5 < 2022) & (B1_t5 >=2021) , B1_t5, 0)
+t_6 = np.where((B1_t6 < 2022) & (B1_t6 >=2021) , B1_t6, 0)
+
+t_2021=t_1+t_2+t_3+t_4+t_5+t_6
+
+
+Prob_1_2021 = np.where((t_1 !=0) , B4_t1, 0)
+Prob_2_2021 = np.where((t_2 !=0) , B4_t2, 0)
+Prob_3_2021 = np.where((t_3 !=0) , B4_t3, 0)
+Prob_4_2021 = np.where((t_4 !=0) , B4_t4, 0)
+Prob_5_2021 = np.where((t_5 !=0) , B4_t5, 0)
+Prob_6_2021 = np.where((t_6 !=0) , B4_t6, 0)
+
+Prob_2021=Prob_1_2021+Prob_2_2021+Prob_3_2021+Prob_4_2021+Prob_5_2021+Prob_6_2021
+
+del  t_1,t_2,t_3,t_4,t_5,t_6
+del Prob_1_2021,Prob_2_2021,Prob_3_2021,Prob_4_2021,Prob_5_2021,Prob_6_2021
+
+#2022
+t_1 = np.where((B1_t1 < 2023) & (B1_t1 >=2022) , B1_t1, 0)
+t_2 = np.where((B1_t2 < 2023) & (B1_t2 >=2022) , B1_t2, 0)
+t_3 = np.where((B1_t3 < 2023) & (B1_t3 >=2022) , B1_t3, 0)
+t_4 = np.where((B1_t4 < 2023) & (B1_t4 >=2022) , B1_t4, 0)
+t_5 = np.where((B1_t5 < 2023) & (B1_t5 >=2022) , B1_t5, 0)
+t_6 = np.where((B1_t6 < 2023) & (B1_t6 >=2022) , B1_t6, 0)
+
+t_2022=t_1+t_2+t_3+t_4+t_5+t_6
+
+Prob_1_2022 = np.where((t_1 !=0) , B4_t1, 0)
+Prob_2_2022 = np.where((t_2 !=0) , B4_t2, 0)
+Prob_3_2022 = np.where((t_3 !=0) , B4_t3, 0)
+Prob_4_2022 = np.where((t_4 !=0) , B4_t4, 0)
+Prob_5_2022 = np.where((t_5 !=0) , B4_t5, 0)
+Prob_6_2022 = np.where((t_6 !=0) , B4_t6, 0)
+
+Prob_2022=Prob_1_2022+Prob_2_2022+Prob_3_2022+Prob_4_2022+Prob_5_2022+Prob_6_2022
+del  t_1,t_2,t_3,t_4,t_5,t_6
+del Prob_1_2022,Prob_2_2022,Prob_3_2022,Prob_4_2022,Prob_5_2022,Prob_6_2022
+
+
+###################################################################
+## Fourth part: Extract for each plot the amount of pixels that changed
+###################################################################
+
+# Round the date to year without decimals
+t_2016=np.floor(t_2016)
+t_2017=np.floor(t_2017)
+t_2018=np.floor(t_2018)
+t_2019=np.floor(t_2019)
+t_2020=np.floor(t_2020)
+t_2021=np.floor(t_2021)
+t_2022=np.floor(t_2022)
+
+# Upload a raster of plots
+dir_raster_plot=input('Where is the plot's raster?: ')
+os.chdir(dir_raster_plot)
+Plot=gdal.Open('Raster_Control_ext_mod.tiff')
+
+#Get the only band
+Plot=Plot.GetRasterBand(1).ReadAsArray().astype(np.float32)
+#Mask the plots. Discart the rest 
+Plot= np.where(Plot !=0 , Plot, -1)
+
+# Create a list with all plots
+n_plot=list(set(Plot[Plot!=-1]))
+#Create a 1D array
+Plot=Plot.flatten()
+
+#Generate list to be filled with a loop
+val_2016=[]
+val_2017=[]
+val_2018=[]
+val_2019=[]
+val_2020=[]
+val_2021=[]
+val_2022=[]
+zeros=[]
+count_px=[]
+name=[]  
+P1_16=[]
+P1_17=[]
+P1_18=[]
+P1_19=[]
+P1_20=[]
+P1_21=[]
+P1_22=[]
+porcent=0 
+
+#Create a dataframe
+dP = pd.DataFrame()
+
+# For each plot...
+for y in range(len(n_plot)):
+    print((porcent/len(n_plot))*100)
+    # ...create an array with 1 (the plot) and -1 (where there no are plot)
+    samples=np.where((Plot ==n_plot[y]) , 1, -1)
+    # In order to no rewrite we made copies and it were converted to an 1D array
+    c_2016=t_2016.copy()
+    c_2017=t_2017.copy()
+    c_2018=t_2018.copy()
+    c_2019=t_2019.copy()
+    c_2020=t_2020.copy()
+    c_2021=t_2021.copy()
+    c_2022=t_2022.copy()
+    
+    c_2016=c_2016.flatten()
+    c_2017=c_2017.flatten()
+    c_2018=c_2018.flatten()
+    c_2019=c_2019.flatten()
+    c_2020=c_2020.flatten()
+    c_2021=c_2021.flatten()
+    c_2022=c_2022.flatten()
+
+    P1_2016=Prob_2016.copy()
+    P1_2017=Prob_2017.copy()
+    P1_2018=Prob_2018.copy()
+    P1_2019=Prob_2019.copy()
+    P1_2020=Prob_2020.copy()
+    P1_2021=Prob_2021.copy()
+    P1_2022=Prob_2022.copy()
+    
+    P1_2016=P1_2016.flatten()
+    P1_2017=P1_2017.flatten()
+    P1_2018=P1_2018.flatten()
+    P1_2019=P1_2019.flatten()
+    P1_2020=P1_2020.flatten()
+    P1_2021=P1_2021.flatten()
+    P1_2022=P1_2022.flatten()
+
+    # Extract for each date the pixels that changed
+    c_2016= np.where((Plot ==n_plot[y]),c_2016, -1)
+    c_2017= np.where((Plot ==n_plot[y]),c_2017, -1)
+    c_2018= np.where((Plot ==n_plot[y]),c_2018, -1)
+    c_2019= np.where((Plot ==n_plot[y]),c_2019, -1)
+    c_2020= np.where((Plot ==n_plot[y]),c_2020, -1)
+    c_2021= np.where((Plot ==n_plot[y]),c_2021, -1)
+    c_2022=np.where((Plot ==n_plot[y]),c_2022, -1)
+
+    # Extract for each date the pixels that changed with a probability of 1
+    P1_2016=np.where((Plot ==n_plot[y]),P1_2016, 999)
+    P1_2017=np.where((Plot ==n_plot[y]),P1_2017, 999)
+    P1_2018=np.where((Plot ==n_plot[y]),P1_2018, 999)
+    P1_2019=np.where((Plot ==n_plot[y]),P1_2019, 999)
+    P1_2020=np.where((Plot ==n_plot[y]),P1_2020, 999)
+    P1_2021=np.where((Plot ==n_plot[y]),P1_2021, 999)
+    P1_2022=np.where((Plot ==n_plot[y]),P1_2022, 999)
+
+    # Make a list with each year
+    c_2016=list(c_2016[c_2016 != -1])
+    c_2017=list(c_2017[c_2017 != -1])
+    c_2018=list(c_2018[c_2018 != -1])
+    c_2019=list(c_2019[c_2019 != -1])
+    c_2020=list(c_2020[c_2020 != -1])
+    c_2021=list(c_2021[c_2021 != -1])
+    c_2022=list(c_2022[c_2022 != -1])
+    
+    P1_2016=list(P1_2016[P1_2016 != 999])
+    P1_2017=list(P1_2017[P1_2017 != 999])
+    P1_2018=list(P1_2018[P1_2018 != 999])
+    P1_2019=list(P1_2019[P1_2019 != 999])
+    P1_2020=list(P1_2020[P1_2020 != 999])
+    P1_2021=list(P1_2021[P1_2021 != 999])
+    P1_2022=list(P1_2022[P1_2022 != 999])
+
+    # Add the number of changes in each year to previously created lists
+    val_2016.append(c_2016.count(2016))
+    val_2017.append(c_2017.count(2017))
+    val_2018.append(c_2018.count(2018))
+    val_2019.append(c_2019.count(2019))
+    val_2020.append(c_2020.count(2020))
+    val_2021.append(c_2021.count(2021))
+    val_2022.append(c_2022.count(2022))                
+    
+    P1_16.append(P1_2016.count(1))
+    P1_17.append(P1_2017.count(1))
+    P1_18.append(P1_2018.count(1))
+    P1_19.append(P1_2019.count(1))
+    P1_20.append(P1_2020.count(1))
+    P1_21.append(P1_2021.count(1))
+    P1_22.append(P1_2022.count(1))
+                        
+    samples=list(samples[samples != -1])
+    
+    count_px.append(samples.count(1))
+    name.append(n_plot[y])
+    porcent+=1
+
+#Add the result in the dataframe
+dP['ID']=name
+dP['N_pixel']=count_px
+dP['N_pixel_16']=val_2016
+dP['N_pixel_17']=val_2017
+dP['N_pixel_18']=val_2018
+dP['N_pixel_19']=val_2019
+dP['N_pixel_20']=val_2020
+dP['N_pixel_21']=val_2021
+dP['N_pixel_22']=val_2022
+
+dP['P1_16']=P1_16
+dP['P1_17']=P1_17
+dP['P1_18']=P1_18
+dP['P1_19']=P1_19
+dP['P1_20']=P1_20
+dP['P1_21']=P1_21
+dP['P1_22']=P1_22
+
+# Save the dataframe into a CSV
+dP.to_csv('Control_prob.csv', header=True, index=True)
