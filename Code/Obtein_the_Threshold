@@ -1,0 +1,357 @@
+'''
+
+The following code allows us to know the lower threshold of the optimal percentage of change to separate plots without changes in thinning. 
+As well as the upper threshold to separate thin from short to done
+
+'''
+#####################################
+# First part: Import libraries
+#####################################
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline  
+import os
+import rasterio
+import rasterio.features
+import rasterio.warp
+from osgeo import gdal
+from matplotlib import pyplot
+from rasterio.plot import show 
+import geopandas as gpd
+from osgeo import ogr, osr
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay, classification_report,f1_score
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split 
+
+#####################################
+# Second part: upload CSV
+#####################################
+directory=input('Where is the .csv?')
+os.chdir(directory)
+
+dT = pd.read_csv('Thinning.csv')
+dCon = pd.read_csv('Control.csv')
+dCC = pd.read_csv('Clear_cutting.csv')
+
+
+dir_SHP=input('Where is the .shp?')
+os.chdir(dir_SHP)
+SHP_T=gpd.read_file('Thinning_plot.shp')
+SHP_C=gpd.read_file('Control_plot.shp')
+SHP_CC=gpd.read_file('Clear_cutting_plot.shp')
+
+
+#####################################
+# Third part: Calculate the percentage of change
+#####################################
+
+#Claras
+
+union_claras=pd.merge(dT, SHP_T, on='ID')
+
+union_claras['%2016']=(union_claras['P1_16']/(union_claras['N_pixel']))*100
+union_claras['%2017']=(union_claras['P1_17']/(union_claras['N_pixel']))*100
+union_claras['%2018']=(union_claras['P1_18']/(union_claras['N_pixel']))*100
+union_claras['%2019']=(+union_claras['P1_19']/(union_claras['N_pixel']))*100
+union_claras['%2020']=((union_claras['P1_20'])/(union_claras['N_pixel']))*100
+union_claras['%2021']=((union_claras['P1_21'])/(union_claras['N_pixel']))*100
+union_claras['%2022']=(union_claras['P1_22'])/(union_claras['N_pixel'])*100
+ac_claras=union_claras
+ac_claras['Fecha_apro']=ac_claras['Fecha_apro'].astype(float)
+selec_claras=ac_claras.loc[((ac_claras['TIPOCORTA1']=='Clara')|(ac_claras['TIPOCORTA1']=='clara'))&(ac_claras['ID']!=21)]
+selec_CH=ac_claras.loc[(ac_claras['TIPOCORTA1']=='corta a hecho')|(ac_claras['TIPOCORTA1']=='Corta a hecho')]
+
+
+#Clear_cutting
+
+
+union_cortas=pd.merge(dCC, SHP_CC, on='ID')
+union_cortas['%2016']=(union_cortas['P1_16']/(union_cortas['N_pixel']))*100
+union_cortas['%2017']=(union_cortas['P1_17']/(union_cortas['N_pixel']))*100
+union_cortas['%2018']=(union_cortas['P1_18']/(union_cortas['N_pixel']))*100
+union_cortas['%2019']=(union_cortas['P1_19']/(union_cortas['N_pixel']))*100
+union_cortas['%2020']=((union_cortas['P1_20'])/(union_cortas['N_pixel']))*100
+union_cortas['%2021']=((union_cortas['P1_21'])/(union_cortas['N_pixel']))*100
+union_cortas['%2022']=(union_cortas['P1_22'])/(union_cortas['N_pixel'])*100
+ac_cortas=union_cortas
+ac_cortas['Fecha_apro']=ac_cortas['Fecha_apro'].astype(float)
+selec_cortas=ac_cortas.loc[((ac_cortas['TIPOCORTA1']=='Corta a hecho')|(ac_cortas['TIPOCORTA1']=='corta a hecho'))&((ac_cortas['ID']!=1213)&(ac_cortas['ID']!=741)&(ac_cortas['ID']!=1167))]
+selec_C=ac_cortas.loc[((ac_cortas['TIPOCORTA1']=='Clara')|(ac_cortas['TIPOCORTA1']=='clara'))]
+selec_cortas
+
+
+#Control
+
+
+#Control
+
+SHP_Control.columns = ['ID', 'Especie', 'Area', 'Area_Calcu', 'Perimeter', 'RATIO', 'Numero','ABREV','geometry']
+
+union_control=pd.merge(dCon, SHP_C, on='ID')
+union_control['%2016']=(union_control['P1_16']/(union_control['N_pixel']))*100
+union_control['%2017']=(union_control['P1_17']/(union_control['N_pixel']))*100
+union_control['%2018']=(union_control['P1_18']/(union_control['N_pixel']))*100
+union_control['%2019']=(union_control['P1_19']/(union_control['N_pixel']))*100
+union_control['%2020']=((union_control['P1_20'])/(union_control['N_pixel']))*100
+union_control['%2021']=((union_control['P1_21'])/(union_control['N_pixel']))*100
+union_control['%2022']=(union_control['P1_22'])/(union_control['N_pixel'])*100
+ac_control=union_control
+
+#Join all the plot for categories
+
+cortas=pd.concat([selec_cortas,selec_CH])
+claras=pd.concat([selec_C,selec_claras])
+control=ac_control
+
+#####################################
+# Fourth part: Divide the plots
+#####################################
+
+sel_cortas=cortas.sample(n = 220, random_state = 4)
+sel_claras=claras.sample(n = 220, random_state = 4)
+sel_control=control.sample(n = 220, random_state = 4)
+
+# Split in 70 and 30% 
+np.random.seed(1)
+random_claras, random_claras_test = train_test_split(sel_claras, test_size = 0.30)
+np.random.seed(1)
+random_cortas, random_cortas_test = train_test_split(sel_cortas, test_size = 0.30)
+np.random.seed(1)
+random_control, random_control_test = train_test_split(sel_control, test_size = 0.30)
+
+#Join all the train plots
+aprov = pd.concat([random_claras,random_cortas, random_control])
+#Fill the column 'Clara_Hech' with N
+aprov['Clara_Hech']=aprov['Clara_Hech'].fillna('N')
+
+#####################################
+# Fifth part: Get the best threshold
+#####################################
+
+#List to storage results
+umbral_bajo=[]
+umbral_alto=[]
+f_score_micro=[]
+f_score_macro=[]
+accuracy=[]
+
+#Try all posible combinations of thresholds
+
+for A in range (100,-1,-1):
+    for B in range (1,101):
+        if A>B:
+            #Classifies into no change (N), thinning (C) and clear-cutting (H) to done depending on the percentage of change. It is done for each year
+            aprov.loc[(aprov['%2016'] >= B)&(aprov['%2016']  < A), ['2016']] = ['C']
+            aprov.loc[(aprov['%2016'] <B), ['2016']] = ['N']
+            aprov.loc[(aprov['%2016'] >= A), ['2016']] = ['H']
+
+            aprov.loc[(aprov['%2017'] >= B)&(aprov['%2017']  <A), ['2017']] = ['C']
+            aprov.loc[(aprov['%2017'] <B), ['2017']] = ['N']
+            aprov.loc[(aprov['%2017'] >= A), ['2017']] = ['H']
+
+            aprov.loc[(aprov['%2018'] >= B)&(aprov['%2018']  <A), ['2018']] = ['C']
+            aprov.loc[(aprov['%2018'] <B), ['2018']] = ['N']
+            aprov.loc[(aprov['%2018'] >= A), ['2018']] = ['H']
+
+            aprov.loc[(aprov['%2019'] >=B)&(aprov['%2019']  <A), ['2019']] = ['C']
+            aprov.loc[(aprov['%2019'] <B), ['2019']] = ['N']
+            aprov.loc[(aprov['%2019'] >=A), ['2019']] = ['H']
+
+            aprov.loc[(aprov['%2020'] >=B)&(aprov['%2020']  < A), ['2020']] = ['C']
+            aprov.loc[(aprov['%2020'] <B), ['2020']] = ['N']
+            aprov.loc[(aprov['%2020'] >= A), ['2020']] = ['H']
+
+            aprov.loc[(aprov['%2021'] >= B)&(aprov['%2021']  <A), ['2021']] = ['C']
+            aprov.loc[(aprov['%2021'] <B), ['2021']] = ['N']
+            aprov.loc[(aprov['%2021'] >=A), ['2021']] = ['H']
+
+            aprov.loc[(aprov['%2022'] >= B)&(aprov['%2022']  <A), ['2022']] = ['C']
+            aprov.loc[(aprov['%2022'] <B), ['2022']] = ['N']
+            aprov.loc[(aprov['%2022'] >= A), ['2022']] = ['H']
+
+            aprov['verif']='F'
+            aprov['2023']='X'
+            aprov['2024']='X'
+
+            #Check the detected change date with the true one. This takes into account a range of plus or minus one year 
+            year=['2016','2017','2018','2019','2020','2021','2022','2023','2024']
+            for i in range(len(year)):
+                if year[i] != '2023':
+                    aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['Clara_Hech'] =='C')&(aprov[year[i+1]] =='C')&(aprov['verif'] !='T'), ['verif']] = ['T']
+                    aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['Clara_Hech'] =='C')&(aprov[year[i]] =='C')&(aprov['verif'] !='T'), ['verif']] = ['T']
+                    aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['Clara_Hech'] =='C')&(aprov[year[i+2]] =='C')&(aprov['verif'] !='T'), ['verif']] = ['T']
+
+                    aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['Clara_Hech'] =='H')&(aprov[year[i+1]] =='H')&(aprov['verif'] !='T'), ['verif']] = ['T']
+                    aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['Clara_Hech'] =='H')&(aprov[year[i]] =='H')&(aprov['verif'] !='T'), ['verif']] = ['T']
+                    aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['Clara_Hech'] =='H')&(aprov[year[i+2]] =='H')&(aprov['verif'] !='T'), ['verif']] = ['T']
+
+                else:
+                    break
+
+
+            #For a plot to be considered as having no change, it does not have to have changes in the period from 2018 to 2021.
+            aprov.loc[(aprov['Clara_Hech']=='N')&(aprov['2018'] =='N')&(aprov['2019'] =='N')&(aprov['2020'] =='N')&(aprov['2021'] =='N'), ['verif']] = ['T']
+
+            aprov['pred']='X'
+
+            aprov.loc[(aprov['verif'] =='T')&(aprov['Clara_Hech'] =='H'), ['pred']] = ['H']
+            aprov.loc[(aprov['verif'] =='T')&(aprov['Clara_Hech'] =='C'), ['pred']] = ['C']
+            aprov.loc[(aprov['verif'] =='T')&(aprov['Clara_Hech'] =='N'), ['pred']] = ['N']
+
+
+
+            #If what is predicted does not coincide with what is observed, the label of the exchange rate that occurred on the true date is placed.
+
+            year=['2016','2017','2018','2019','2020','2021','2022','2023']
+            for i in range(len(year)):
+                    if i<5:
+                        aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='C')&(aprov['pred']=='X'),['pred']] = ['C']
+                        aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='H')&(aprov['pred']=='X'),['pred']] = ['H']
+                        aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&(aprov[year[i]]=='C'),['pred']] = ['C']
+                        aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&(aprov[year[i+2]]=='C'),['pred']] = ['C']
+                        aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&(aprov[year[i]]=='H'),['pred']] = ['H']
+                        aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&(aprov[year[i+2]]=='H'),['pred']] = ['H']
+                        aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&((aprov[year[i]]=='N')&(aprov[year[i+2]]=='N')),['pred']] = ['N']
+
+                    elif year[i]=='2021':
+                        aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='C')&(aprov['pred']=='X'),['pred']] = ['C']
+                        aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='H')&(aprov['pred']=='X'),['pred']] = ['H']
+                        aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&(aprov[year[i]]=='C'),['pred']] = ['C']
+                        aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&(aprov[year[i]]=='H'),['pred']] = ['H']
+                        aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&(aprov[year[i]]=='N'),['pred']] = ['N']
+
+                    else:
+                        break
+
+            #In the case of poorly classified control plots, they will be labeled with the exchange rate closest to the observed date.
+            year=['2018','2019','2020','2021']
+            for i in range(len(year)):
+                    aprov.loc[(aprov['verif'] =='F')&(aprov['Clara_Hech']=='N')&(aprov[year[i]]=='C')&(aprov['pred']=='X'),['pred']] = ['C']
+                    aprov.loc[(aprov['verif'] =='F')&(aprov['Clara_Hech']=='N')&(aprov[year[i]]=='H')&(aprov['pred']=='X'),['pred']] = ['H']
+            #Calculate F-SCORE, Accuracy and the confusion matrix
+            y_aprov=np.array(aprov['pred'])
+            y_true_aprov=np.array(aprov['Clara_Hech'])
+            f_score_mic=f1_score(y_true_aprov, y_aprov, labels=['C','H','N'], average='micro', sample_weight=None, zero_division='warn')
+            f_score_mac=f1_score(y_true_aprov, y_aprov, labels=['C','H','N'], average='macro', sample_weight=None, zero_division='warn')
+            accuracy_x=accuracy_score(y_true_aprov, y_aprov)
+            f_score_micro.append(f_score_mic)
+            f_score_macro.append(f_score_mac)
+            umbral_bajo.append(B)
+            umbral_alto.append(A)
+            accuracy.append(accuracy_x)
+
+# Show the best F-SCORE (macro)
+
+analisis= pd.DataFrame()
+analisis['Umbral_alto']=umbral_alto
+analisis['Umbral_bajo']=umbral_bajo
+analisis['F-Score_Macro']=f_score_macro
+analisis['F-Score_Micro']=f_score_micro
+analisis['Accuracy']=accuracy
+analisis.loc[(analisis['F-Score_Macro']==analisis['F-Score_Macro'].max())]
+
+
+#####################################
+# Sixth part: validation
+#####################################
+
+# Join the test plots
+aprov = pd.concat([random_claras_test,random_cortas_test, random_control_test])
+aprov['Clara_Hech']=aprov['Clara_Hech'].fillna('N')
+
+
+#Set the highest and lowest threshold and repet the code above
+A=35
+B=1
+
+
+aprov.loc[(aprov['%2016'] >= B)&(aprov['%2016']  < A), ['2016']] = ['C']
+aprov.loc[(aprov['%2016'] <B), ['2016']] = ['N']
+aprov.loc[(aprov['%2016'] >= A), ['2016']] = ['H']
+
+aprov.loc[(aprov['%2017'] >= B)&(aprov['%2017']  <A), ['2017']] = ['C']
+aprov.loc[(aprov['%2017'] <B), ['2017']] = ['N']
+aprov.loc[(aprov['%2017'] >= A), ['2017']] = ['H']
+
+aprov.loc[(aprov['%2018'] >= B)&(aprov['%2018']  <A), ['2018']] = ['C']
+aprov.loc[(aprov['%2018'] <B), ['2018']] = ['N']
+aprov.loc[(aprov['%2018'] >= A), ['2018']] = ['H']
+
+aprov.loc[(aprov['%2019'] >=B)&(aprov['%2019']  <A), ['2019']] = ['C']
+aprov.loc[(aprov['%2019'] <B), ['2019']] = ['N']
+aprov.loc[(aprov['%2019'] >=A), ['2019']] = ['H']
+
+aprov.loc[(aprov['%2020'] >=B)&(aprov['%2020']  < A), ['2020']] = ['C']
+aprov.loc[(aprov['%2020'] <B), ['2020']] = ['N']
+aprov.loc[(aprov['%2020'] >= A), ['2020']] = ['H']
+
+aprov.loc[(aprov['%2021'] >= B)&(aprov['%2021']  <A), ['2021']] = ['C']
+aprov.loc[(aprov['%2021'] <B), ['2021']] = ['N']
+aprov.loc[(aprov['%2021'] >=A), ['2021']] = ['H']
+
+aprov.loc[(aprov['%2022'] >= B)&(aprov['%2022']  <A), ['2022']] = ['C']
+aprov.loc[(aprov['%2022'] <B), ['2022']] = ['N']
+aprov.loc[(aprov['%2022'] >= A), ['2022']] = ['H']
+
+aprov['verif']='F'
+aprov['2023']='X'
+aprov['2024']='X'
+
+year=['2016','2017','2018','2019','2020','2021','2022','2023','2024']
+for i in range(len(year)):
+    if year[i] != '2023':
+        aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['Clara_Hech'] =='C')&(aprov[year[i+1]] =='C')&(aprov['verif'] !='T'), ['verif']] = ['T']
+        aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['Clara_Hech'] =='C')&(aprov[year[i]] =='C')&(aprov['verif'] !='T'), ['verif']] = ['T']
+        aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['Clara_Hech'] =='C')&(aprov[year[i+2]] =='C')&(aprov['verif'] !='T'), ['verif']] = ['T']
+
+        aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['Clara_Hech'] =='H')&(aprov[year[i+1]] =='H')&(aprov['verif'] !='T'), ['verif']] = ['T']
+        aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['Clara_Hech'] =='H')&(aprov[year[i]] =='H')&(aprov['verif'] !='T'), ['verif']] = ['T']
+        aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['Clara_Hech'] =='H')&(aprov[year[i+2]] =='H')&(aprov['verif'] !='T'), ['verif']] = ['T']
+
+    else:
+        break
+
+
+aprov.loc[(aprov['Clara_Hech']=='N')&(aprov['2018'] =='N')&(aprov['2019'] =='N')&(aprov['2020'] =='N')&(aprov['2021'] =='N'), ['verif']] = ['T']
+
+aprov['pred']='X'
+ 
+aprov.loc[(aprov['verif'] =='T')&(aprov['Clara_Hech'] =='H'), ['pred']] = ['H']
+aprov.loc[(aprov['verif'] =='T')&(aprov['Clara_Hech'] =='C'), ['pred']] = ['C']
+aprov.loc[(aprov['verif'] =='T')&(aprov['Clara_Hech'] =='N'), ['pred']] = ['N']
+
+year=['2016','2017','2018','2019','2020','2021','2022','2023']
+for i in range(len(year)):
+        if i<5:
+            aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='C')&(aprov['pred']=='X'),['pred']] = ['C']
+            aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='H')&(aprov['pred']=='X'),['pred']] = ['H']
+            aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&(aprov[year[i]]=='C'),['pred']] = ['C']
+            aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&(aprov[year[i+2]]=='C'),['pred']] = ['C']
+            aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&(aprov[year[i]]=='H'),['pred']] = ['H']
+            aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&(aprov[year[i+2]]=='H'),['pred']] = ['H']
+            aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&((aprov[year[i]]=='N')&(aprov[year[i+2]]=='N')),['pred']] = ['N']
+            
+        elif year[i]=='2021':
+            aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='C')&(aprov['pred']=='X'),['pred']] = ['C']
+            aprov.loc[(aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='H')&(aprov['pred']=='X'),['pred']] = ['H']
+            aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&(aprov[year[i]]=='C'),['pred']] = ['C']
+            aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&(aprov[year[i]]=='H'),['pred']] = ['H']
+            aprov.loc[((aprov['Fecha_apro'] ==int(year[i+1]))&(aprov['verif'] =='F')&(aprov[year[i+1]]=='N')&(aprov['pred']=='X'))&(aprov[year[i]]=='N'),['pred']] = ['N']
+
+        else:
+            break
+
+            
+year=['2018','2019','2020','2021']
+for i in range(len(year)):
+        aprov.loc[(aprov['verif'] =='F')&(aprov['Clara_Hech']=='N')&(aprov[year[i]]=='C')&(aprov['pred']=='X'),['pred']] = ['C']
+        aprov.loc[(aprov['verif'] =='F')&(aprov['Clara_Hech']=='N')&(aprov[year[i]]=='H')&(aprov['pred']=='X'),['pred']] = ['H']
+        
+y_aprov=np.array(aprov['pred'])
+y_true_aprov=np.array(aprov['Clara_Hech'])
+
+confusion_matrix(y_true_aprov, y_aprov, labels=['C','H','N'])
+            
