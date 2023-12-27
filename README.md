@@ -1,7 +1,7 @@
 # Harvesting
 
 
-#English
+## English
 
 This folder has all the code implemented in the article called "..." written by.....
 
@@ -13,9 +13,11 @@ In order to obtein the research's results it is necessary to open and run the di
 4- Obtein the threshold
 5- Classification and export
 
+Also in the folder Auxiliary Code you could find the code implemented to use the magnitude variable
 
 
-# Español
+
+## Español
 
 Esta carpeta tiene todo el código implementado en el artículo llamado "..." escrito por.....
 
@@ -26,3 +28,5 @@ Para obtener los resultados de la investigación es necesario abrir y ejecutar l
 3- Raster to CSV
 4- Obtein the threshold
 5- Classification and export
+
+Además en la capeta denominada "Auxiliary Code" podrás encontrar el código implementado para evaluar el resultado de usar la magnitud como variable
