@@ -29,10 +29,10 @@ from sklearn.model_selection import train_test_split
 #####################################
 directory=input('Where is the .csv?')
 os.chdir(directory)
-
-dT = pd.read_csv('Thinning.csv')
-dCon = pd.read_csv('Control.csv')
-dCC = pd.read_csv('Clear_cutting.csv')
+#These csv were created in Raster_to_CSV code
+dT = pd.read_csv('Thinning_prob.csv')
+dCon = pd.read_csv('Control_prob.csv')
+dCC = pd.read_csv('Clear_cutting_prob.csv')
 
 
 dir_SHP=input('Where is the .shp?')
@@ -46,7 +46,7 @@ SHP_CC=gpd.read_file('Clear_cutting_plot.shp')
 # Third part: Calculate the percentage of change
 #####################################
 
-#Claras
+#Thinning
 
 union_claras=pd.merge(dT, SHP_T, on='ID')
 
