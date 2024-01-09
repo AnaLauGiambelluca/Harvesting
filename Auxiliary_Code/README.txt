@@ -1,7 +1,7 @@
 
 # English
 
-The codes developed and storaged in this folder were implemented to evaluate whether the magnitude of change is a better variable for detecting changes than using the date.
+The codes developed and storaged in this folder were implemented to evaluate if the magnitude of change is a better variable for detecting changes than using the date.
 As can be seen, they are similar to the codes used with the tBreak variable, however in the for loop the range implemented to obtain the optimal threshold is different.
 As with the dates, the CSV had to be created first and then the maximum thresholds were obtained through the loop.
 So the correct sequence of codes is:
