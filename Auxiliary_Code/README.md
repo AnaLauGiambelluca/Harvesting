@@ -5,9 +5,9 @@ The codes developed and storaged in this folder were implemented to evaluate if 
 As can be seen, they are similar to the codes used with the tBreak variable, however in the for loop the range implemented to obtain the optimal threshold is different.
 As with the dates, the CSV had to be created first and then the maximum thresholds were obtained through the loop.
 So the correct sequence of codes is:
-1- Create_CSV
-2- Obtain_Optimal_Threshold
-3- Classification_and_Export
+1- [Create_CSV](Auxiliary_Code/1-Create_CSV.py)
+2- [Obtain_Optimal_Threshold](Auxiliary_Code/1-Create_CSV.py)
+3- [Classification_and_Export](Auxiliary_Code/3-Classification_and_Export.py)
 
 # Español
 
@@ -15,6 +15,6 @@ El código desarrollado y almacenado en esta carpeta fue implementado para evalu
 Como se aprecia son similares a los códigos usado con la variable tBreak, sin embargo en el bucle for el rango implementado para obtener el umbral óptimo es diferente.
 Al igual que con las fechas primero se tuvo que crear el CSV y luego por medio de el bucle se obtuvieron los umbrales máximos.
 Por lo que la secuencia correcta de códigos es:
-1- Crear_CSV
-2- Obtener_Umbral_Óptimo
-3- Clasificación_y_Exportación
+1- [Create_CSV](Auxiliary_Code/1-Create_CSV.py)
+2- [Obtain_Optimal_Threshold](Auxiliary_Code/1-Create_CSV.py)
+3- [Classification_and_Export](Auxiliary_Code/3-Classification_and_Export.py)
