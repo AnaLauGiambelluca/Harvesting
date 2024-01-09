@@ -12,7 +12,7 @@ However, it was modified considering our needy
 //////////////////////////////////
 // First part: Upload your layers
 //////////////////////////////////
-// You have to upload the layer of study. In this case, it is "control"
+// You have to upload the layer of study. In this case, it is "control". Vectorial layers are available in the folder called "Layers"
 
 var studyRegion= control;
 // We can see this plots using the follow code:
