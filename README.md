@@ -7,11 +7,11 @@ This folder has all the code implemented in the article called "..." written by.
 
 In order to obtein the research's results it is necessary to open and run the different codes in order:
 
-1- CCDC's base
-2- CCDC Raster Conditioning
-3- Raster to CSV
-4- Obtein the threshold
-5- Classification and export
+1- [CCDC's base ](Harvesting/Code/CCDC_Base.txt).
+2- [CCDC Raster Conditioning](Harvesting/Code/CCDC_Raster_Conditioning.txt)
+3- [Raster to CSV](Harvesting/Code/Raster_to_CSV.py)
+4- [Obtain the threshold](Harvesting/Code/Obtein_the_Threshold.py)
+5- [Classification and export](Harvesting/Code/Classification_and_export.py)
 
 Also in the folder Auxiliary Code you could find the code implemented to use the magnitude variable
 
@@ -27,11 +27,11 @@ Esta carpeta tiene todo el código implementado en el artículo llamado "..." es
 
 Para obtener los resultados de la investigación es necesario abrir y ejecutar los diferentes códigos en orden:
 
-1- CCDC's base
-2- CCDC Raster Conditioning
-3- Raster to CSV
-4- Obtein the threshold
-5- Classification and export
+1- [CCDC's base ](Harvesting/Code/CCDC_Base.txt).
+2- [CCDC Raster Conditioning](Harvesting/Code/CCDC_Raster_Conditioning.txt)
+3- [Raster to CSV](Harvesting/Code/Raster_to_CSV.py)
+4- [Obtain the threshold](Harvesting/Code/Obtein_the_Threshold.py)
+5- [Classification and export](Harvesting/Code/Classification_and_export.py)
 
 Además en la capeta denominada "Auxiliary Code" podrás encontrar el código implementado para evaluar el resultado de usar la magnitud como variable
 Los resultados analizados en este artículo se encuentran disponibles en la carpeta "CSV_Results"
