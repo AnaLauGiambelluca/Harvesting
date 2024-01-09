@@ -15,6 +15,7 @@ In order to obtein the research's results it is necessary to open and run the di
 
 Also in the folder Auxiliary Code you could find the code implemented to use the magnitude variable
 
+The result that were analysed in this article is upload in the folder CSV_Results
 
 
 ## Español
@@ -30,3 +31,4 @@ Para obtener los resultados de la investigación es necesario abrir y ejecutar l
 5- Classification and export
 
 Además en la capeta denominada "Auxiliary Code" podrás encontrar el código implementado para evaluar el resultado de usar la magnitud como variable
+Los resultados analizados en este artículo se encuentran disponibles en la carpeta "CSV_Results"
