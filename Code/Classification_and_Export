@@ -59,7 +59,6 @@ union_claras['%2021']=((union_claras['P1_21'])/(union_claras['N_pixel']))*100
 union_claras['%2022']=(union_claras['P1_22'])/(union_claras['N_pixel'])*100
 ac_claras=union_claras
 ac_claras['Fecha_apro']=ac_claras['Fecha_apro'].astype(float)
-selec_claras=ac_claras.loc[((ac_claras['TIPOCORTA1']=='Clara')|(ac_claras['TIPOCORTA1']=='clara'))&(ac_claras['ID']!=21)]
 selec_CH=ac_claras.loc[(ac_claras['TIPOCORTA1']=='corta a hecho')|(ac_claras['TIPOCORTA1']=='Corta a hecho')]
 
 
@@ -76,7 +75,6 @@ union_cortas['%2021']=((union_cortas['P1_21'])/(union_cortas['N_pixel']))*100
 union_cortas['%2022']=(union_cortas['P1_22'])/(union_cortas['N_pixel'])*100
 ac_cortas=union_cortas
 ac_cortas['Fecha_apro']=ac_cortas['Fecha_apro'].astype(float)
-selec_cortas=ac_cortas.loc[((ac_cortas['TIPOCORTA1']=='Corta a hecho')|(ac_cortas['TIPOCORTA1']=='corta a hecho'))&((ac_cortas['ID']!=1213)&(ac_cortas['ID']!=741)&(ac_cortas['ID']!=1167))]
 selec_C=ac_cortas.loc[((ac_cortas['TIPOCORTA1']=='Clara')|(ac_cortas['TIPOCORTA1']=='clara'))]
 
 #Control
