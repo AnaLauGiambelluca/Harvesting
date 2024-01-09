@@ -36,5 +36,5 @@ Para obtener los resultados de la investigación es necesario abrir y ejecutar l
 Además en la capeta denominada "Auxiliary Code" podrás encontrar el código implementado para evaluar el resultado de usar la magnitud como variable
 Los resultados analizados en este artículo se encuentran disponibles en la carpeta "CSV_Results"
 
-*Nota:
+* Nota:
 Resaltar que en GEE se utilizaron las parcelas de aprovechamientos como una única capa. No obstante las parcelas son las mismas que si se juntasen las almacenadas en "Thinning_plot" y "Clear_cutting_plot" solo que estas últimas ya se encuentran filtradas con las parcelas definitivas utilizadas en el presente trabajo. Es por eso que solo estan cargadas las finales, a fin de no confundir al usuario del código.
