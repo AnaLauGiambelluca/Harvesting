@@ -121,7 +121,7 @@ Map.addLayer(union_6,{min:2015,max:2022},'t6');
 // Fourth part: Export each level as a raster
 //////////////////////////////////
 
-// The archive will be saved into you drive
+// The archive will be saved into you drive. Results are upload in the folder called "Layers/Raster_Layer" CCDC_A is for forest harvesting practice plots and CCDC_C for control plots
 
 Export.image.toDrive({
   image: union_1,
