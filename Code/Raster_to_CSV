@@ -38,12 +38,12 @@ SHP_CC=gpd.read_file('Clear_cutting_plot.shp')
 
 directory_raster=input('Where are raster layers?: ')
 os.chdir(directory_raster)
-B_t1=gdal.Open('CCDC_t1.tif')
-B_t2=gdal.Open('CCDC_t2.tif')
-B_t3=gdal.Open('CCDC_t3.tif')
-B_t4=gdal.Open('CCDC_t4.tif')
-B_t5=gdal.Open('CCDC_t5.tif')
-B_t6=gdal.Open('CCDC_t6.tif')
+B_t1=gdal.Open('CCDC_A_t1_prob_B7_B6.tif') #These names are from the raster layer folder... this could change for example if you consider control plots the name will be CCDC_C_t1_prob_B7_B6
+B_t2=gdal.Open('CCDC_A_t2_prob_B7_B6.tif')
+B_t3=gdal.Open('CCDC_A_t3_prob_B7_B6.tif')
+B_t4=gdal.Open('CCDC_A_t4_prob_B7_B6.tif')
+B_t5=gdal.Open('CCDC_A_t5_prob_B7_B6.tif')
+B_t6=gdal.Open('CCDC_A_t6_prob_B7_B6.tif')
 
 // Extract the first band... in this case tBreak with the date of change
 
@@ -54,13 +54,13 @@ B1_t4=B_t4.GetRasterBand(1).ReadAsArray().astype(np.float32)
 B1_t5=B_t5.GetRasterBand(1).ReadAsArray().astype(np.float32)
 B1_t6=B_t6.GetRasterBand(1).ReadAsArray().astype(np.float32)
 
-// Extract the second band... in this case changeProb with the probability of change
-B4_t1=B_t1.GetRasterBand(2).ReadAsArray().astype(np.float32)
-B4_t2=B_t2.GetRasterBand(2).ReadAsArray().astype(np.float32)
-B4_t3=B_t3.GetRasterBand(2).ReadAsArray().astype(np.float32)
-B4_t4=B_t4.GetRasterBand(2).ReadAsArray().astype(np.float32)
-B4_t5=B_t5.GetRasterBand(2).ReadAsArray().astype(np.float32)
-B4_t6=B_t6.GetRasterBand(2).ReadAsArray().astype(np.float32)
+// Extract the fourth band... in this case changeProb with the probability of change
+B4_t1=B_t1.GetRasterBand(4).ReadAsArray().astype(np.float32)
+B4_t2=B_t2.GetRasterBand(4).ReadAsArray().astype(np.float32)
+B4_t3=B_t3.GetRasterBand(4).ReadAsArray().astype(np.float32)
+B4_t4=B_t4.GetRasterBand(4).ReadAsArray().astype(np.float32)
+B4_t5=B_t5.GetRasterBand(4).ReadAsArray().astype(np.float32)
+B4_t6=B_t6.GetRasterBand(4).ReadAsArray().astype(np.float32)
 
 
 ###################################################################
@@ -267,7 +267,7 @@ t_2022=np.floor(t_2022)
 # Upload a raster of plots
 dir_raster_plot=input('Where is the plot's raster?: ')
 os.chdir(dir_raster_plot)
-Plot=gdal.Open('Raster_Control_ext_mod.tiff')
+Plot=gdal.Open('Raster_T_ext.tiff') #These layers are available in Layers/Raster_Layer/Extension.zip
 
 #Get the only band
 Plot=Plot.GetRasterBand(1).ReadAsArray().astype(np.float32)
@@ -418,4 +418,4 @@ dP['P1_21']=P1_21
 dP['P1_22']=P1_22
 
 # Save the dataframe into a CSV
-dP.to_csv('Control_prob.csv', header=True, index=True)
+dP.to_csv('Thinning_prob.csv', header=True, index=True)
