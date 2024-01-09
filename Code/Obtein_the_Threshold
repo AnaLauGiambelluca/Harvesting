@@ -32,9 +32,10 @@ from sklearn.model_selection import train_test_split
 directory=input('Where is the .csv?')
 os.chdir(directory)
 
-dT = pd.read_csv('Thinning.csv')
-dCon = pd.read_csv('Control.csv')
-dCC = pd.read_csv('Clear_cutting.csv')
+## CSV created in Raster_to_CSV code
+dT = pd.read_csv('Thinning_prob.csv')
+dCon = pd.read_csv('Control_prob.csv')
+dCC = pd.read_csv('Clear_cutting_prob.csv')
 
 
 dir_SHP=input('Where is the .shp?')
@@ -132,8 +133,8 @@ aprov['Clara_Hech']=aprov['Clara_Hech'].fillna('N')
 #####################################
 
 #List to storage results
-umbral_bajo=[]
-umbral_alto=[]
+umbral_bajo=[] # Low threshold
+umbral_alto=[] # High threshold
 f_score_micro=[]
 f_score_macro=[]
 accuracy=[]
