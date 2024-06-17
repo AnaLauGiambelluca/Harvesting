@@ -38,12 +38,12 @@ SHP_CC=gpd.read_file('Clear_cutting_plot.shp')
 
 directory_raster=input('Where are raster layers?: ')
 os.chdir(directory_raster)
-B_t1=gdal.Open('CCDC_A_t1_prob_B7_B6.tif') #These names are from the raster layer folder... this could change for example if you consider control plots the name will be CCDC_C_t1_prob_B7_B6
-B_t2=gdal.Open('CCDC_A_t2_prob_B7_B6.tif')
-B_t3=gdal.Open('CCDC_A_t3_prob_B7_B6.tif')
-B_t4=gdal.Open('CCDC_A_t4_prob_B7_B6.tif')
-B_t5=gdal.Open('CCDC_A_t5_prob_B7_B6.tif')
-B_t6=gdal.Open('CCDC_A_t6_prob_B7_B6.tif')
+B_t1=gdal.Open('CCDC_A_t1_B2aB7.tif') #These names are from the raster layer folder... this could change for example if you consider control plots the name will be CCDC_C_t1_B2aB7
+B_t2=gdal.Open('CCDC_A_t2_B2aB7.tif')
+B_t3=gdal.Open('CCDC_A_t3_B2aB7.tif')
+B_t4=gdal.Open('CCDC_A_t4_B2aB7.tif')
+B_t5=gdal.Open('CCDC_A_t5_B2aB7.tif')
+B_t6=gdal.Open('CCDC_A_t6_B2aB7.tif')
 
 // Extract the first band... in this case tBreak with the date of change
 
