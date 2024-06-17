@@ -62,9 +62,9 @@ union_claras['%2021']=((union_claras['P1_21'])/(union_claras['N_pixel']))*100
 union_claras['%2022']=(union_claras['P1_22'])/(union_claras['N_pixel'])*100
 ac_claras=union_claras
 ac_claras['Fecha_apro']=ac_claras['Fecha_apro'].astype(float)
-#Some clear-cutting plot could be with thinning plot, for that these are separated
+#Some clear-cutting plot could be with thinning plot, for that these are separated. So if you have a unique shp well labeled this step it is not necessary
 selec_CH=ac_claras.loc[(ac_claras['TIPOCORTA1']=='corta a hecho')|(ac_claras['TIPOCORTA1']=='Corta a hecho')]
-
+ac_claras=ac_claras.loc[((ac_claras['TIPOCORTA1']=='Clara')|(ac_claras['TIPOCORTA1']=='clara'))]
 
 #Clear_cutting
 
@@ -79,8 +79,9 @@ union_cortas['%2021']=((union_cortas['P1_21'])/(union_cortas['N_pixel']))*100
 union_cortas['%2022']=(union_cortas['P1_22'])/(union_cortas['N_pixel'])*100
 ac_cortas=union_cortas
 ac_cortas['Fecha_apro']=ac_cortas['Fecha_apro'].astype(float)
-#Some thinning plot could be with clear-cutting plot, for that these are separated
+#Some thinning plot could be with clear-cutting plot, for that these are separated. So if you have a unique shp well labeled this step it is not necessary
 selec_C=ac_cortas.loc[((ac_cortas['TIPOCORTA1']=='Clara')|(ac_cortas['TIPOCORTA1']=='clara'))]
+ac_cortas=ac_cortas.loc[(ac_cortas['TIPOCORTA1']=='corta a hecho')|(ac_cortas['TIPOCORTA1']=='Corta a hecho')]
 
 #Control
 
@@ -99,8 +100,8 @@ ac_control=union_control
 
 #Join all the plot for categories
 
-cortas=pd.concat([selec_cortas,selec_CH])
-claras=pd.concat([selec_C,selec_claras])
+cortas=pd.concat([ac_cortas,selec_CH])
+claras=pd.concat([selec_C,ac_claras])
 control=ac_control
 
 #####################################
