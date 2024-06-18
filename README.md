@@ -13,7 +13,6 @@ In order to obtein the research's results it is necessary to open and run the di
 4- [Obtain the threshold](Code/Obtein_the_Threshold.py)
 5- [Classification and export](Code/Classification_and_export.py)
 
-Also in the folder Auxiliary Code you could find the code implemented to use the magnitude variable
 
 The result that were analysed in this article is upload in the folder CSV_Results
 
@@ -33,7 +32,6 @@ Para obtener los resultados de la investigación es necesario abrir y ejecutar l
 4- [Obtain the threshold](Code/Obtein_the_Threshold.py)
 5- [Classification and export](Code/Classification_and_export.py)
 
-Además en la capeta denominada "Auxiliary Code" podrás encontrar el código implementado para evaluar el resultado de usar la magnitud como variable
 Los resultados analizados en este artículo se encuentran disponibles en la carpeta "CSV_Results"
 
 * Nota:
