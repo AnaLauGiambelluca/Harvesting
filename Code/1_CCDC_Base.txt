@@ -25,8 +25,8 @@ Map.centerObject(studyRegion);
 //////////////////////////////////
 
 var changeDetectionParameters = {
-  // Which band/index or combination will you use?... in this case SR_B7 and SR_B6, that is to say SWIR2 and SWIR1
-  breakpointBands: ['SR_B7','SR_B6'],
+  // Which band/index or combination will you use?
+  breakpointBands: [bands to consider],
   // The default parameters that we used
   minObservations: 3,
   chiSquareProbability: 0.99,
@@ -183,14 +183,11 @@ var filteredLandsat=imagen(studyRegion);
 // Fourth part: Set CCDC parameters
 //////////////////////////////////
 
-
  // Select the band/index that will be use to detect changes
-changeDetectionParameters.collection = filteredLandsat.select('SR_B7','SR_B6');
+changeDetectionParameters.collection = filteredLandsat.select(bands to consider);
 
 // Run CCDC
 var results = ee.Algorithms.TemporalSegmentation.Ccdc(changeDetectionParameters);
-
-print('ccdc',results);
 
 // Create dictionary to export
 var paramsCombined = ee.Dictionary(changeDetectionParameters).combine(inputParams).remove(['collection']);
