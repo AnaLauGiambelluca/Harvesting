@@ -38,7 +38,7 @@ SHP_CC=gpd.read_file('Clear_cutting_plot.shp')
 
 directory_raster=input('Where are raster layers?: ')
 os.chdir(directory_raster)
-B_t1=gdal.Open('CCDC_A_t1_B2aB7.tif') #These names are from the raster layer folder... this could change for example if you consider control plots the name will be CCDC_C_t1_B2aB7
+B_t1=gdal.Open('CCDC_A_t1_B2aB7.tif') #These names are from the raster obtained from the second code (2_CCDC_Raster_Conditioning)
 B_t2=gdal.Open('CCDC_A_t2_B2aB7.tif')
 B_t3=gdal.Open('CCDC_A_t3_B2aB7.tif')
 B_t4=gdal.Open('CCDC_A_t4_B2aB7.tif')
@@ -267,7 +267,7 @@ t_2022=np.floor(t_2022)
 # Upload a raster of plots
 dir_raster_plot=input('Where is the plot's raster?: ')
 os.chdir(dir_raster_plot)
-Plot=gdal.Open('Raster_T_ext.tiff') #These layers are available in Layers/Raster_Layer/Extension.zip
+Plot=gdal.Open('Raster_extention.tiff') #These layers is used to mask the areas of the study area
 
 #Get the only band
 Plot=Plot.GetRasterBand(1).ReadAsArray().astype(np.float32)
