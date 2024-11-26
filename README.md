@@ -3,7 +3,7 @@
 
 ## English
 
-This folder has all the code implemented in the article called "..." written by.....
+This folder has all the code implemented in the article called "Identifying forest harvesting practices: clear-cutting and thinning in diverse tree species using dense Landsat time series" written by A. L. Giambelluca, T. Hermosilla, J. Álvarez-Mozos, M. González-Audícana
 
 In order to obtein the research's results it is necessary to open and run the different codes in order:
 
@@ -22,7 +22,7 @@ Highlight that in GEE the harvesting plots were used as a single layer. However,
 
 ## Español
 
-Esta carpeta tiene todo el código implementado en el artículo llamado "..." escrito por.....
+Esta carpeta tiene todo el código implementado en el artículo llamado "Identifying forest harvesting practices: clear-cutting and thinning in diverse tree species using dense Landsat time series" escrito por A. L. Giambelluca, T. Hermosilla, J. Álvarez-Mozos, M. González-Audícana
 
 Para obtener los resultados de la investigación es necesario abrir y ejecutar los diferentes códigos en orden:
 
