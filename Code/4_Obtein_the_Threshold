@@ -49,7 +49,7 @@ SHP_CC=gpd.read_file('Clear_cutting_plot.shp')
 # Third part: Calculate the percentage of change
 #####################################
 
-#Claras
+#Thinning
 
 union_claras=pd.merge(dT, SHP_T, on='ID')
 
@@ -60,11 +60,9 @@ union_claras['%2019']=(+union_claras['P1_19']/(union_claras['N_pixel']))*100
 union_claras['%2020']=((union_claras['P1_20'])/(union_claras['N_pixel']))*100
 union_claras['%2021']=((union_claras['P1_21'])/(union_claras['N_pixel']))*100
 union_claras['%2022']=(union_claras['P1_22'])/(union_claras['N_pixel'])*100
-ac_claras=union_claras
-ac_claras['Fecha_apro']=ac_claras['Fecha_apro'].astype(float)
-#Some clear-cutting plot could be with thinning plot, for that these are separated. So if you have a unique shp well labeled this step it is not necessary
-selec_CH=ac_claras.loc[(ac_claras['TIPOCORTA1']=='corta a hecho')|(ac_claras['TIPOCORTA1']=='Corta a hecho')]
-ac_claras=ac_claras.loc[((ac_claras['TIPOCORTA1']=='Clara')|(ac_claras['TIPOCORTA1']=='clara'))]
+claras=union_claras
+claras['Fecha_apro']=claras['Fecha_apro'].astype(float)
+
 
 #Clear_cutting
 
@@ -77,11 +75,9 @@ union_cortas['%2019']=(union_cortas['P1_19']/(union_cortas['N_pixel']))*100
 union_cortas['%2020']=((union_cortas['P1_20'])/(union_cortas['N_pixel']))*100
 union_cortas['%2021']=((union_cortas['P1_21'])/(union_cortas['N_pixel']))*100
 union_cortas['%2022']=(union_cortas['P1_22'])/(union_cortas['N_pixel'])*100
-ac_cortas=union_cortas
-ac_cortas['Fecha_apro']=ac_cortas['Fecha_apro'].astype(float)
-#Some thinning plot could be with clear-cutting plot, for that these are separated. So if you have a unique shp well labeled this step it is not necessary
-selec_C=ac_cortas.loc[((ac_cortas['TIPOCORTA1']=='Clara')|(ac_cortas['TIPOCORTA1']=='clara'))]
-ac_cortas=ac_cortas.loc[(ac_cortas['TIPOCORTA1']=='corta a hecho')|(ac_cortas['TIPOCORTA1']=='Corta a hecho')]
+cortas=union_cortas
+cortas['Fecha_apro']=cortas['Fecha_apro'].astype(float)
+
 
 #Control
 
@@ -96,13 +92,7 @@ union_control['%2019']=(union_control['P1_19']/(union_control['N_pixel']))*100
 union_control['%2020']=((union_control['P1_20'])/(union_control['N_pixel']))*100
 union_control['%2021']=((union_control['P1_21'])/(union_control['N_pixel']))*100
 union_control['%2022']=(union_control['P1_22'])/(union_control['N_pixel'])*100
-ac_control=union_control
-
-#Join all the plot for categories
-
-cortas=pd.concat([ac_cortas,selec_CH])
-claras=pd.concat([selec_C,ac_claras])
-control=ac_control
+control=union_control
 
 #####################################
 # Fourth part: Divide the plots
@@ -123,7 +113,7 @@ random_control, random_control_test = train_test_split(sel_control, test_size = 
 #Join all the train plots
 aprov = pd.concat([random_claras,random_cortas, random_control])
 #Fill the column 'Clara_Hech' with N
-aprov['Clara_Hech']=aprov['Clara_Hech'].fillna('N')
+aprov['Clara_Hech']=aprov['Clara_Hech'].fillna('N') # 'Clara_Hech' it is the label of each forest harvesting practice ('H'=Clear-cutting, 'C'=Thinning, 'N'=non-harvested
 
 #####################################
 # Fifth part: Get the best threshold
@@ -262,8 +252,8 @@ aprov['Clara_Hech']=aprov['Clara_Hech'].fillna('N')
 
 
 #Set the highest and lowest threshold and repet the code above
-A=35
-B=1
+A= #Best upper threshold
+B= #Best lower threshold
 
 
 aprov.loc[(aprov['%2016'] >= B)&(aprov['%2016']  < A), ['2016']] = ['C']
