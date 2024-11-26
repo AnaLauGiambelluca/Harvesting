@@ -57,9 +57,9 @@ union_claras['%2019']=(+union_claras['P1_19']/(union_claras['N_pixel']))*100
 union_claras['%2020']=((union_claras['P1_20'])/(union_claras['N_pixel']))*100
 union_claras['%2021']=((union_claras['P1_21'])/(union_claras['N_pixel']))*100
 union_claras['%2022']=(union_claras['P1_22'])/(union_claras['N_pixel'])*100
-ac_claras=union_claras
-ac_claras['Fecha_apro']=ac_claras['Fecha_apro'].astype(float)
-selec_CH=ac_claras.loc[(ac_claras['TIPOCORTA1']=='corta a hecho')|(ac_claras['TIPOCORTA1']=='Corta a hecho')]
+claras=union_claras
+claras['Fecha_apro']=claras['Fecha_apro'].astype(float)
+
 
 
 #Clear_cutting
@@ -73,9 +73,9 @@ union_cortas['%2019']=(union_cortas['P1_19']/(union_cortas['N_pixel']))*100
 union_cortas['%2020']=((union_cortas['P1_20'])/(union_cortas['N_pixel']))*100
 union_cortas['%2021']=((union_cortas['P1_21'])/(union_cortas['N_pixel']))*100
 union_cortas['%2022']=(union_cortas['P1_22'])/(union_cortas['N_pixel'])*100
-ac_cortas=union_cortas
-ac_cortas['Fecha_apro']=ac_cortas['Fecha_apro'].astype(float)
-selec_C=ac_cortas.loc[((ac_cortas['TIPOCORTA1']=='Clara')|(ac_cortas['TIPOCORTA1']=='clara'))]
+cortas=union_cortas
+cortas['Fecha_apro']=cortas['Fecha_apro'].astype(float)
+
 
 #Control
 
@@ -92,13 +92,8 @@ union_control['%2019']=(union_control['P1_19']/(union_control['N_pixel']))*100
 union_control['%2020']=((union_control['P1_20'])/(union_control['N_pixel']))*100
 union_control['%2021']=((union_control['P1_21'])/(union_control['N_pixel']))*100
 union_control['%2022']=(union_control['P1_22'])/(union_control['N_pixel'])*100
-ac_control=union_control
+control=union_control
 
-#Join all the plot for categories
-
-cortas=pd.concat([selec_cortas,selec_CH])
-claras=pd.concat([selec_C,selec_claras])
-control=ac_control
 
 #####################################
 # Fourth part: Join all plots and classify
@@ -109,8 +104,8 @@ aprov = pd.concat([claras,cortas, control])
 #Fill the column 'Clara_Hech' with N
 aprov['Clara_Hech']=aprov['Clara_Hech'].fillna('N')
 
-A=35
-B=1
+A= #Best upper treshold
+B= #Best lower treshold
 
 aprov.loc[(aprov['%2016'] >= B)&(aprov['%2016']  < A), ['2016']] = ['C']
 aprov.loc[(aprov['%2016'] <B), ['2016']] = ['N']
@@ -162,8 +157,6 @@ for i in range(len(year)):
     else:
         break
 
-
-#Si en todos los años hay control
 aprov.loc[(aprov['Clara_Hech']=='N')&(aprov['2018'] =='N')&(aprov['2019'] =='N')&(aprov['2020'] =='N')&(aprov['2021'] =='N'), ['verif']] = ['T']
 
 aprov['pred']='X'
@@ -173,8 +166,6 @@ aprov.loc[(aprov['verif'] =='T')&(aprov['Clara_Hech'] =='C'), ['pred']] = ['C']
 aprov.loc[(aprov['verif'] =='T')&(aprov['Clara_Hech'] =='N'), ['pred']] = ['N']
 
 
-
-#Falsos coloca la clasificacion que tiene esa fecha
 
 year=['2016','2017','2018','2019','2020','2021','2022','2023']
 for i in range(len(year)):
